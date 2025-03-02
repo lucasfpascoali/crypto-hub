@@ -1,0 +1,6 @@
+# IDEs config
+.idea
+.code
+
+# asdf config
+.tool-versions
