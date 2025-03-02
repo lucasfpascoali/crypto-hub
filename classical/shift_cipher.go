@@ -7,6 +7,10 @@ type ShiftCipher struct {
 	MatchCase bool
 }
 
+func NewCaesarCipher(matchCase bool) *ShiftCipher {
+	return NewShiftCipher(3, matchCase)
+}
+
 func NewShiftCipher(key uint64, matchCase bool) *ShiftCipher {
 	return &ShiftCipher{Key: byte(key % 26), MatchCase: matchCase}
 }
