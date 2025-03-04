@@ -3,7 +3,7 @@ package classical
 import "errors"
 
 type ShiftCipher struct {
-	Key       byte
+	Key       int
 	MatchCase bool
 }
 
@@ -12,7 +12,7 @@ func NewCaesarCipher(matchCase bool) *ShiftCipher {
 }
 
 func NewShiftCipher(key uint64, matchCase bool) *ShiftCipher {
-	return &ShiftCipher{Key: byte(key % 26), MatchCase: matchCase}
+	return &ShiftCipher{Key: mod(int(key), alphabetSize), MatchCase: matchCase}
 }
 
 func (s *ShiftCipher) Encrypt(plaintext []byte) ([]byte, error) {
@@ -20,21 +20,7 @@ func (s *ShiftCipher) Encrypt(plaintext []byte) ([]byte, error) {
 		return nil, errors.New("plaintext is empty")
 	}
 
-	var ciphertext = make([]byte, len(plaintext))
-	for i, b := range plaintext {
-		if !isAlphabetical(b) {
-			continue
-		}
-
-		startIndex := lowerCaseStartIndex
-		if s.MatchCase && b <= upperCaseEndIndex {
-			startIndex = upperCaseStartIndex
-		}
-
-		ciphertext[i] = startIndex + ((b - startIndex + s.Key) % 26)
-	}
-
-	return ciphertext, nil
+	return shiftLetters(plaintext, s.Key, s.MatchCase), nil
 }
 
 func (s *ShiftCipher) Decrypt(ciphertext []byte) ([]byte, error) {
@@ -42,19 +28,29 @@ func (s *ShiftCipher) Decrypt(ciphertext []byte) ([]byte, error) {
 		return nil, errors.New("ciphertext is empty")
 	}
 
-	var plaintext = make([]byte, len(ciphertext))
-	for i, b := range ciphertext {
+	return shiftLetters(ciphertext, -s.Key, s.MatchCase), nil
+}
+
+func shiftLetters(text []byte, shift int, matchCase bool) []byte {
+	result := make([]byte, len(text))
+	for i, b := range text {
 		if !isAlphabetical(b) {
+			result[i] = b
 			continue
 		}
 
-		startIndex := lowerCaseStartIndex
-		if s.MatchCase && b <= upperCaseEndIndex {
-			startIndex = upperCaseStartIndex
+		caseIndex := lowerCaseStartIndex
+		if b <= upperCaseEndIndex {
+			caseIndex = upperCaseStartIndex
 		}
 
-		plaintext[i] = startIndex + ((b - startIndex - s.Key) % 26)
+		if matchCase {
+			result[i] = byte(caseIndex + mod(int(b)-caseIndex+shift, alphabetSize))
+			continue
+		}
+
+		result[i] = byte(lowerCaseStartIndex + mod(int(b)-caseIndex+shift, alphabetSize))
 	}
 
-	return plaintext, nil
+	return result
 }

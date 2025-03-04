@@ -1,9 +1,10 @@
 package classical
 
-const upperCaseStartIndex = byte(65)
-const upperCaseEndIndex = byte(90)
-const lowerCaseStartIndex = byte(97)
-const lowerCaseEndIndex = byte(122)
+const alphabetSize = 26
+const upperCaseStartIndex = 65
+const upperCaseEndIndex = 90
+const lowerCaseStartIndex = 97
+const lowerCaseEndIndex = 122
 
 func isAlphabetical(b byte) bool {
 	if b >= 'a' && b <= 'z' {
@@ -15,4 +16,8 @@ func isAlphabetical(b byte) bool {
 	}
 
 	return false
+}
+
+func mod(n, m int) int {
+	return (n%m + m) % m
 }
